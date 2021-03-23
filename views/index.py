@@ -70,10 +70,14 @@ def fun1(self, url, type):
 
     '''
     self.Label1 = Label(self, text='RESULT ：').grid(row=2, column=0)
-    value1 = StringVar()
-    self.Label1 = Label(self, textvariable=value1, justify='left').grid(row=3, column=1)
-    value1.set(type.get())
 
+    # value1 = StringVar()
+    # self.Label1 = Label(self, textvariable=value1, justify='left').grid(row=3, column=1)
+    # value1.set(type.get())
+
+    text = Text(self,height=45)
+    text.grid(row=4,column=1,columnspan=49)
+    txt="无结果"
     types = {
         'asp': asp, 'brf': brf, 'cfm': cfm, 'cgi': cgi, 'js': js, 'php': php
     }
@@ -83,43 +87,65 @@ def fun1(self, url, type):
         for zurl in asp.asp:
             zurl = url.get() + "/" + zurl
             response = requests.get(zurl)
-            print(zurl + "====>" + response)
+            print(zurl)
+            print(response)
             if response.status_code == 200:
-                res.append(zurl)
-                value1.set(res)
-        print(res)
+                res.append(zurl + "\n")
+                huanhang = "\n"
+                list = huanhang.join(res)
+                txt = list
 
     if (type.get() == "brf"):
+        res = []
         for zurl in brf.brf:
             zurl = url.get() + "/" + zurl
             response = requests.get(zurl)
+            print(zurl)
             print(response)
             if response.status_code == 200:
-                value1.set(zurl)
+                res.append(zurl + "\n")
+                huanhang = "\n"
+                list = huanhang.join(res)
+                txt = list
 
     if (type.get() == "cfm"):
+        res = []
         for zurl in cfm.cfm:
             zurl = url.get() + "/" + zurl
             response = requests.get(zurl)
+            print(zurl)
             print(response)
             if response.status_code == 200:
-                value1.set(zurl)
+                res.append(zurl + "\n")
+                huanhang = "\n"
+                list = huanhang.join(res)
+                txt = list
 
     if (type.get() == "cgi"):
+        res = []
         for zurl in cgi.cgi:
             zurl = url.get() + "/" + zurl
             response = requests.get(zurl)
+            print(zurl)
             print(response)
             if response.status_code == 200:
-                value1.set(zurl)
+                res.append(zurl + "\n")
+                huanhang = "\n"
+                list = huanhang.join(res)
+                txt = list
 
     if (type.get() == "js"):
+        res = []
         for zurl in js.js:
             zurl = url.get() + "/" + zurl
             response = requests.get(zurl)
+            print(zurl)
             print(response)
             if response.status_code == 200:
-                value1.set(zurl)
+                res.append(zurl + "\n")
+                huanhang = "\n"
+                list = huanhang.join(res)
+                txt = list
 
     if (type.get() == "php"):
         res = []
@@ -130,8 +156,9 @@ def fun1(self, url, type):
                 res.append(zurl + "\n")
                 huanhang = "\n"
                 list = huanhang.join(res)
-                value1.set(list)
-        print(list)
+                txt=list
+
+    text.insert('insert', txt)
 
 
 class searchChildNetWork(Frame):
@@ -141,7 +168,7 @@ class searchChildNetWork(Frame):
         self.Label = Label(self, text='请输入域名:').grid(row=1, column=0, padx=20, pady=50)
         value = StringVar()
         url = Entry(self, textvariable=value)
-        url.grid(row=1, column=1, padx=0, pady=5)
+        url.grid(row=1, column=1, padx=0, pady=0)
         type = StringVar()
         numberChosen = ttk.Combobox(self, width=12, textvariable=type)
         numberChosen['values'] = ('asp', 'brf', 'cfm', 'cgi', 'js', 'php')  # 设置下拉列表的值
