@@ -1,3 +1,5 @@
+# import thread
+from socket import *
 from tkinter import *
 from tkinter import ttk
 
@@ -25,8 +27,8 @@ class Controller(Frame):
         self.pageFourth.grid(row=0, column=1, sticky='nsew')
         self.pageFifth = baoliPojie(self)
         self.pageFifth.grid(row=0, column=1, sticky='nsew')
-        self.pageSixth = test(self)
-        self.pageSixth.grid(row=0, column=1, sticky='nsew')
+        # self.pageSixth = test(self)
+        # self.pageSixth.grid(row=0, column=1, sticky='nsew')
         self.pageIndex = index(self)
         self.pageIndex.grid(row=0, column=1, sticky='nsew')
         self.menu = testOverlap(self)
@@ -56,9 +58,9 @@ class testOverlap(Frame):
         self.pageFifth = Button(self, text="暴力破解", background="WHITE", height=2, width=22,
                                 command=self.master.pageFifth.tkraise)
         self.pageFifth.grid(row=4, column=0)
-        self.pageSixth = Button(self, text="MD5加解密", background="WHITE", height=2, width=22,
-                                command=self.master.pageSixth.tkraise)
-        self.pageSixth.grid(row=5, column=0)
+        # self.pageSixth = Button(self, text="MD5加解密", background="WHITE", height=2, width=22,
+        #                         command=self.master.pageSixth.tkraise)
+        # self.pageSixth.grid(row=5, column=0)
 
 
 def fun1(self, url, type):
@@ -153,6 +155,8 @@ def fun1(self, url, type):
         for zurl in php.php:
             zurl = url.get() + "/" + zurl
             response = requests.get(zurl)
+            print(zurl)
+            print(response)
             if response.status_code == 200:
                 res.append(zurl + "\n")
                 huanhang = "\n"
@@ -161,6 +165,41 @@ def fun1(self, url, type):
 
     text.insert('insert', txt)
 
+
+def fun2(self, url, portStart, portEnd):
+    '''
+    通过命令行查询开放的端口再演示
+    netstat -a -n
+    Args:
+        self:
+        url:
+        portStart:
+        portEnd:
+
+    Returns:
+
+    '''
+    self.Label1 = Label(self, text='开放的端口号 ：').grid(row=2, column=0)
+
+    text = Text(self, height=45)
+    text.grid(row=4, column=1, columnspan=49)
+    txt = "无端口开放"
+
+    host = url.get()
+    target_ip = gethostbyname(host)
+
+    opened_ports = []
+
+    for port in range(int(portStart.get()), int(portEnd.get())):
+        sock = socket(AF_INET, SOCK_STREAM)
+        sock.settimeout(10)
+        result = sock.connect_ex((target_ip, port))
+        if result == 0:
+            print(port)
+            opened_ports.append(port)
+            txt = opened_ports
+
+    text.insert('insert', txt)
 
 def fun4(self, url):
     self.Label1 = Label(self, text='RESULT ：').grid(row=2, column=0)
@@ -176,8 +215,8 @@ def fun4(self, url):
     if response.status_code == 200:
         print(url)
         res = etree.HTML(response.text)
-        txt="注册商为："+res.xpath('string(//div[@class="block ball"]/span[1])')+"\n"
-        txt=txt+'联系邮箱为：' +res.xpath('string(//div[@class="fr WhLeList-right block ball lh24"]/span[1])')+"\n"
+        txt = "注册商为：" + res.xpath('string(//div[@class="block ball"]/span[1])') + "\n"
+        txt = txt + '联系邮箱为：' + res.xpath('string(//div[@class="fr WhLeList-right block ball lh24"]/span[1])') + "\n"
         txt = txt + '创建时间为：' + res.xpath('string(//div[@class="fr WhLeList-right"]/span[1])') + "\n"
         txt = txt + '联系电话为：' + res.xpath('string(//ul[@id="sh_info"]/li[4]/div[2]/span[1])') + "\n"
         txt = txt + '过期时间为：' + res.xpath('string(//ul[@id="sh_info"]/li[6]/div[2]/span[1])') + "\n"
@@ -187,7 +226,6 @@ def fun4(self, url):
         txt = "查询失败"
 
     text.insert('insert', txt)
-
 
 class searchChildNetWork(Frame):
     def __init__(self, root):
@@ -210,9 +248,25 @@ class searchChildNetWork(Frame):
 class searchOpenPort(Frame):
     def __init__(self, root):
         Frame.__init__(self, root)
-        self.Label = Label(self, text="查询开放端口", height=50, width=102, background="#B4D5FC")
-        self.Label.grid()
-
+        self.Label = Label(self, text='端口扫描:').grid(row=1, column=0, padx=20, pady=50)
+        value = StringVar()
+        url = Entry(self, width=20, textvariable=value)
+        url.grid(row=1, column=1, padx=0, pady=0)
+        # port1 = StringVar()
+        # port2 = StringVar()
+        # portStart = Entry(self, width=5, textvariable=port1).grid(row=1, column=3)
+        # portEnd = Entry(self, width=5, textvariable=port2).grid(row=1, column=4)
+        port1 = StringVar()
+        start = Entry(self, width=5, textvariable=port1)
+        start.grid(row=1, column=3, padx=0, pady=0)
+        port2 = StringVar()
+        end = Entry(self, width=5, textvariable=port2)
+        end.grid(row=1, column=4, padx=0, pady=0)
+        self.Button = Button(self, text='扫描', width=15, command=lambda: fun2(self, url, start, end)).grid(row=1,
+                                                                                                                  column=5,
+                                                                                                                  sticky=W,
+                                                                                                                  padx=10,
+                                                                                                                  pady=5)
 
 class findOutNetworkType(Frame):
     def __init__(self, root):
