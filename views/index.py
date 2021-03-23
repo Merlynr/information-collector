@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 import requests
+from lxml import etree
 
 from data.subdomain import asp
 from data.subdomain import brf
@@ -75,9 +76,9 @@ def fun1(self, url, type):
     # self.Label1 = Label(self, textvariable=value1, justify='left').grid(row=3, column=1)
     # value1.set(type.get())
 
-    text = Text(self,height=45)
-    text.grid(row=4,column=1,columnspan=49)
-    txt="无结果"
+    text = Text(self, height=45)
+    text.grid(row=4, column=1, columnspan=49)
+    txt = "无结果"
     types = {
         'asp': asp, 'brf': brf, 'cfm': cfm, 'cgi': cgi, 'js': js, 'php': php
     }
@@ -156,7 +157,34 @@ def fun1(self, url, type):
                 res.append(zurl + "\n")
                 huanhang = "\n"
                 list = huanhang.join(res)
-                txt=list
+                txt = list
+
+    text.insert('insert', txt)
+
+
+def fun4(self, url):
+    self.Label1 = Label(self, text='RESULT ：').grid(row=2, column=0)
+
+    text = Text(self, height=45)
+    text.grid(row=4, column=1, columnspan=49)
+    txt = "无结果"
+
+    url = 'http://whois.chinaz.com/' + url.get()
+
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        print(url)
+        res = etree.HTML(response.text)
+        txt="注册商为："+res.xpath('string(//div[@class="block ball"]/span[1])')+"\n"
+        txt=txt+'联系邮箱为：' +res.xpath('string(//div[@class="fr WhLeList-right block ball lh24"]/span[1])')+"\n"
+        txt = txt + '创建时间为：' + res.xpath('string(//div[@class="fr WhLeList-right"]/span[1])') + "\n"
+        txt = txt + '联系电话为：' + res.xpath('string(//ul[@id="sh_info"]/li[4]/div[2]/span[1])') + "\n"
+        txt = txt + '过期时间为：' + res.xpath('string(//ul[@id="sh_info"]/li[6]/div[2]/span[1])') + "\n"
+        txt = txt + '域名服务器为：' + res.xpath('string(//ul[@id="sh_info"]/li[7]/div[2]/span[1])') + "\n"
+        txt = txt + '查询完毕'
+    else:
+        txt = "查询失败"
 
     text.insert('insert', txt)
 
@@ -196,8 +224,13 @@ class findOutNetworkType(Frame):
 class nwtWorkTool(Frame):
     def __init__(self, root):
         Frame.__init__(self, root)
-        self.Label = Label(self, text="站长查询工具", height=50, width=102, background="#B4D5FC")
-        self.Label.grid()
+        self.Label = Label(self, text='请输入域名:').grid(row=1, column=0, padx=20, pady=50)
+        value = StringVar()
+        url = Entry(self, width=20, textvariable=value)
+        url.grid(row=1, column=1, padx=0, pady=0)
+        self.Button = Button(self, text='通过站长工具查询', width=15, command=lambda: fun4(self, url)).grid(row=1, column=3,
+                                                                                                    sticky=W,
+                                                                                                    padx=10, pady=5)
 
 
 class baoliPojie(Frame):
