@@ -13,6 +13,8 @@ from gevent import monkey
 monkey.patch_all()
 from gevent.queue import Queue
 
+import threading
+
 import requests
 from lxml import etree
 
@@ -322,6 +324,7 @@ class searchOpenPort(Frame):
                                                                                                                   sticky=W,
                                                                                                                   padx=10,
                                                                                                                   pady=5)
+CMS="暂无数据"
 
 class gwhatweb(object):
     def __init__(self, url):
@@ -332,10 +335,13 @@ class gwhatweb(object):
         for i in webdata:
             self.tasks.put(i)
         fp.close()
+        global CMS
+        CMS="webdata total:%d" % len(webdata)+"\n"
         print("webdata total:%d" % len(webdata))
         self.whatweb(1000)
 
     def fun3(self,url):
+        global CMS
         self.tasks = Queue()
         self.url = url.get().rstrip("/")
         fp = open('D:\\WorkSpace\\Work\\college\\zhouhaoran\\information-collector\\data\\resource\\data.json', "r",
@@ -357,6 +363,7 @@ class gwhatweb(object):
             self.tasks.get()
 
     def _worker(self):
+        global CMS
         data = self.tasks.get()
         test_url = self.url + data["url"]
         rtext = ''
@@ -374,6 +381,7 @@ class gwhatweb(object):
             if (rtext.find(data["re"]) != -1):
                 result = data["name"]
                 print("CMS:%s Judge:%s re:%s" % (result, test_url, data["re"]))
+                CMS = CMS + "CMS:%s Judge:%s re:%s" % (result, test_url, data["re"])+"\n"
                 self._clearQueue()
                 return True
         else:
@@ -381,6 +389,8 @@ class gwhatweb(object):
             if (md5 == data["md5"]):
                 result = data["name"]
                 print("CMS:%s Judge:%s md5:%s" % (result, test_url, data["md5"]))
+                CMS = CMS + "CMS:%s Judge:%s md5:%s" % (result, test_url, data["md5"])+"\n"
+
                 self._clearQueue()
                 return True
 
@@ -389,11 +399,17 @@ class gwhatweb(object):
             self._worker()
 
     def whatweb(self, maxsize=100):
+        global CMS
         start = time.perf_counter()
         allr = [gevent.spawn(self._boss) for i in range(maxsize)]
         gevent.joinall(allr)
         end = time.perf_counter()
+        CMS = CMS + "cost: %f s" % (end - start) + "\n"
         print("cost: %f s" % (end - start))
+
+def Refresher():
+    Draw()
+
 
 class findOutNetworkType(Frame):
     def __init__(self, root):
@@ -409,8 +425,18 @@ class findOutNetworkType(Frame):
         self.Label1 = Label(self, text='RESULT ：').grid(row=2, column=0)
         text = Text(self, height=45)
         text.grid(row=4, column=1, columnspan=49)
-        txt = "暂无结果"
-        text.insert('insert',txt)
+        # TODO 轮询器实时渲染
+        # TODO 轮询器实时渲染
+        # threading.Timer(1).start()
+        text.insert('insert',CMS)
+        def insertText():
+            text.delete('1.0','end')
+            text.insert('insert',CMS)
+            text.after(2000,insertText)
+
+        text.after(2000,insertText)
+
+
 
 class nwtWorkTool(Frame):
     def __init__(self, root):
