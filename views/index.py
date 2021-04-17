@@ -245,28 +245,37 @@ def fun5(self,url,uName,type):
     text = Text(self, height=45)
     text.grid(row=4, column=1, columnspan=49)
     txt = "该链接无效"
-    URL = url.get()
+    a=url.get()
+    b=a[:-1]
+    URL=b.strip("/")
+
+    # URL = url.get()
     uName=uName.get()
 
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0'}
     response = requests.get(URL, headers=headers)
-
     if response.status_code == 200:
         print('查询成功！')
         if (type.get() == 'post'):
-            f = open("D:\WorkSpace\Work\college\zhouhaoran\information-collector\data\mm\weakly.txt", 'r')
+            f = open("D:\WorkSpace\Work\college\zhouhaoran\information-collector\data\mm\\test.txt", 'r')
             lines = f.readlines()
             i = 0
             res=[]
             for line in lines:
-                paylode = {uName: line}
+                paylode = {uName: line.replace("\n","")}
                 g = requests.post(URL, data=paylode)
-                i = i + 1
-                r = str(i)+"  "+line+"  "+str(len(g.content.decode()))+"\n"
-                res.append(r)
-                print(r)
+                i=i+1
+                data={
+                    'index':i,
+                    'password':line.replace("\n",""),
+                    'res':len(g.content.decode())
+                }
+                res.append(data)
+                print(data)
             f.close()
-            text.insert('insert', res)
+            res.sort(key=func6)
+            resx=str(res)
+            text.insert('insert', resx.replace('}, {', '\n'))
         if (type.get() == 'get'):
             f = open("D:\WorkSpace\Work\college\zhouhaoran\information-collector\data\mm\weakly.txt", 'r')
             lines = f.readlines()
@@ -283,6 +292,10 @@ def fun5(self,url,uName,type):
             text.insert('insert', res)
     else:
         text.insert('insert', "无效URL")
+
+def func6(elem):
+    return elem['res']
+
 
 class searchChildNetWork(Frame):
     def __init__(self, root):
