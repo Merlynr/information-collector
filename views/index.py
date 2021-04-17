@@ -249,7 +249,6 @@ def fun5(self,url,uName,type):
     b=a[:-1]
     URL=b.strip("/")
 
-    # URL = url.get()
     uName=uName.get()
 
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0'}
@@ -282,14 +281,20 @@ def fun5(self,url,uName,type):
             i = 0
             res=[]
             for line in lines:
-                paylode = {URL: line}
-                g = requests.post(uName, data=paylode)
+                paylode = {uName: line.replace("\n", "")}
+                g = requests.get(URL, data=paylode)
                 i = i + 1
-                r = str(i)+"  "+line+"  "+str(len(g.content.decode()))+"\n"
-                res.append(r)
-                print(r)
+                data = {
+                    'index': i,
+                    'password': line.replace("\n", ""),
+                    'res': len(g.content.decode())
+                }
+                res.append(data)
+                print(data)
             f.close()
-            text.insert('insert', res)
+            res.sort(key=func6)
+            resx = str(res)
+            text.insert('insert', resx.replace('}, {', '\n'))
     else:
         text.insert('insert', "无效URL")
 
